@@ -10,6 +10,7 @@ interface PriceCardProps {
   loading: boolean;
   error: string | null;
   icon: string;
+  onClick?: () => void;
 }
 
 function formatPrice(price: number, currency: 'JPY' | 'USD'): string {
@@ -23,20 +24,27 @@ function formatPrice(price: number, currency: 'JPY' | 'USD'): string {
 }
 
 export default function PriceCard({
-  name, symbol, price, change, currency, unit, note, extra, loading, error, icon,
+  name, symbol, price, change, currency, unit, note, extra, loading, error, icon, onClick,
 }: PriceCardProps) {
   const isPositive = change !== null && change > 0;
   const isNegative = change !== null && change < 0;
 
   return (
-    <div className="bg-slate-800 rounded-2xl p-4 flex flex-col gap-1 min-h-[130px] select-none">
+    <div
+      className={`bg-slate-800 rounded-2xl p-4 flex flex-col gap-1 min-h-[130px] select-none
+        ${onClick ? 'cursor-pointer active:bg-slate-700 transition-colors' : ''}`}
+      onClick={onClick}
+    >
       {/* ヘッダー */}
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <span className="text-xl">{icon}</span>
           <span className="text-slate-300 text-sm font-semibold">{name}</span>
         </div>
-        <span className="text-slate-500 text-xs">{symbol}</span>
+        <div className="flex items-center gap-1">
+          <span className="text-slate-500 text-xs">{symbol}</span>
+          {onClick && <span className="text-slate-600 text-xs">▸</span>}
+        </div>
       </div>
 
       {/* コンテンツ */}

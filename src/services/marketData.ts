@@ -10,7 +10,7 @@ const CORS_PROXIES = [
   'https://api.allorigins.win/raw?url=',
 ];
 
-async function fetchViaProxy(url: string): Promise<string> {
+export async function fetchViaProxy(url: string): Promise<string> {
   let lastError: Error | null = null;
 
   for (const proxy of CORS_PROXIES) {
@@ -35,7 +35,7 @@ async function fetchViaProxy(url: string): Promise<string> {
 }
 
 // Yahoo Finance から価格と前日比変化率を取得
-async function fetchYahooFinance(ticker: string): Promise<PriceResult> {
+export async function fetchYahooFinance(ticker: string): Promise<PriceResult> {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=2d`;
   const text = await fetchViaProxy(url);
   const data = JSON.parse(text);
@@ -85,7 +85,7 @@ export async function fetchBitcoin(): Promise<PriceResult> {
   };
 }
 
-// WTI原油先物 USD/バレル (CL=F) — 日本のガソリン価格の参考指標
+// WTI原油先物 USD/バレル (CL=F)
 export async function fetchWTI(): Promise<PriceResult> {
   return fetchYahooFinance('CL=F');
 }
