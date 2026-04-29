@@ -1,0 +1,21 @@
+{
+  "name": "投資情報ダッシュボード",
+  "short_name": "投資情報",
+  "description": "日経平均・S&P500・ゴールド・Bitcoin・ガソリン価格を一目で確認",
+  "start_url": "/investment-dashboard/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/investment-dashboard/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/investment-dashboard/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
