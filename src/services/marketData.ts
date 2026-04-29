@@ -85,48 +85,16 @@ export async function fetchBitcoin(): Promise<PriceResult> {
   };
 }
 
-// 日本のガソリン価格（資源エネルギー庁 週次調査）
+// 日本のガソリン価格（GitHub Actionsで定期取得したJSONファイルから読む）
 export async function fetchGasolineJapan(): Promise<PriceResult> {
-  const url = 'https://www.enecho.meti.go.jp/statistics/petroleum_and_lpgas/pl007/results.html';
-  const html = await fetchViaProxy(url);
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-
-  // テーブルを走査してレギュラーガソリン価格を探す
-  const tables = Array.from(doc.querySelectorAll('table'));
-
-  for (const table of tables) {
-    const text = table.textContent ?? '';
-    if (!text.includes('レギュラー') && !text.includes('ガソリン')) continue;
-
-    const rows = Array.from(table.querySelectorAll('tr'));
-    // データ行（td を含む行）を後ろから順に確認（最新データを優先）
-    const dataRows = rows.filter(row => row.querySelectorAll('td').length >= 2).reverse();
-
-    for (const row of dataRows) {
-      const cells = Array.from(row.querySelectorAll('td'));
-      const dateText = cells[0]?.textContent?.trim() ?? '';
-
-      // 2列目以降でガソリン価格らしい値（100〜250円/L）を探す
-      for (let i = 1; i < Math.min(cells.length, 5); i++) {
-        const raw = cells[i]?.textContent?.trim().replace(/[^\d.]/g, '') ?? '';
-        const price = parseFloat(raw);
-        if (price >= 100 && price <= 250) {
-          return { price, change: null, extra: dateText };
-        }
-      }
-    }
-  }
-
-  // フォールバック: 本文からレギュラー価格を正規表現で探す
-  const match = html.match(/レギュラ[ーｰ]?[\s\S]{0,50}?(\d{3}(?:\.\d+)?)/);
-  if (match) {
-    const price = parseFloat(match[1]);
-    if (price >= 100 && price <= 250) {
-      return { price, change: null };
-    }
-  }
-
-  throw new Error('ガソリン価格を解析できませんでした');
+  const base = import.meta.env.BASE_URL;
+  const response = await fetch(`${base}gasoline.json?t=${Date.now()}`);
+  if (!response.ok) throw new Error('データを取得できませんでした');
+  const data = await response.json();
+  if (!data.price) throw new Error('データ準備中（初回デプロイ後に自動取得されます）');
+  return {
+    price: data.price,
+    change: null,
+    extra: data.date ?? undefined,
+  };
 }

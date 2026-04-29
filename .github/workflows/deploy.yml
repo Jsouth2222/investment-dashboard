@@ -24,6 +24,9 @@ jobs:
       - name: 依存パッケージをインストール
         run: npm ci
 
+      - name: ガソリン価格を取得
+        run: node scripts/fetch-gasoline.mjs || echo "ガソリン価格取得をスキップ"
+
       - name: ビルド
         run: npm run build
 
