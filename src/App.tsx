@@ -5,7 +5,7 @@ import {
   fetchSP500,
   fetchGold,
   fetchBitcoin,
-  fetchGasolineJapan,
+  fetchWTI,
 } from './services/marketData';
 
 interface MarketState {
@@ -30,7 +30,7 @@ export default function App() {
   const [sp500, setSP500] = useState<MarketState>(initialState);
   const [gold, setGold] = useState<MarketState>(initialState);
   const [bitcoin, setBitcoin] = useState<MarketState>(initialState);
-  const [gasoline, setGasoline] = useState<MarketState>(initialState);
+  const [wti, setWTI] = useState<MarketState>(initialState);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -45,7 +45,7 @@ export default function App() {
       fetchSP500(),
       fetchGold(),
       fetchBitcoin(),
-      fetchGasolineJapan(),
+      fetchWTI(),
     ]);
 
     setNikkei(
@@ -68,9 +68,9 @@ export default function App() {
         ? { price: b.value.price, change: b.value.change, loading: false, error: null }
         : { price: null, change: null, loading: false, error: '取得できませんでした' }
     );
-    setGasoline(
+    setWTI(
       gas.status === 'fulfilled'
-        ? { price: gas.value.price, change: null, extra: gas.value.extra, loading: false, error: null }
+        ? { price: gas.value.price, change: gas.value.change, loading: false, error: null }
         : { price: null, change: null, loading: false, error: '取得できませんでした' }
     );
 
@@ -184,17 +184,16 @@ export default function App() {
           />
           <div className="col-span-2 sm:col-span-1">
             <PriceCard
-              name="ガソリン (全国)"
-              symbol="週次"
-              icon="⛽"
-              price={gasoline.price}
-              change={null}
-              currency="JPY"
-              unit="円/L"
-              note="資源エネルギー庁 週次調査"
-              extra={gasoline.extra}
-              loading={gasoline.loading}
-              error={gasoline.error}
+              name="WTI原油"
+              symbol="CL=F"
+              icon="🛢️"
+              price={wti.price}
+              change={wti.change}
+              currency="USD"
+              unit="USD/bbl"
+              note="ガソリン価格の参考指標"
+              loading={wti.loading}
+              error={wti.error}
             />
           </div>
         </div>
@@ -202,7 +201,7 @@ export default function App() {
         {/* フッター情報 */}
         <div className="mt-6 text-center text-xs text-slate-600 space-y-1">
           <p>アプリが開いている間は1分ごとに自動更新されます</p>
-          <p>株価・金・BTC は前日終値比 / ガソリンは週次平均価格</p>
+          <p>株価・金・BTC・WTI原油は前日終値比 / 1分ごと自動更新</p>
         </div>
       </main>
     </div>

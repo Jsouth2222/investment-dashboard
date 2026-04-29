@@ -85,16 +85,7 @@ export async function fetchBitcoin(): Promise<PriceResult> {
   };
 }
 
-// 日本のガソリン価格（GitHub Actionsで定期取得したJSONファイルから読む）
-export async function fetchGasolineJapan(): Promise<PriceResult> {
-  const base = import.meta.env.BASE_URL;
-  const response = await fetch(`${base}gasoline.json?t=${Date.now()}`);
-  if (!response.ok) throw new Error('データを取得できませんでした');
-  const data = await response.json();
-  if (!data.price) throw new Error('データ準備中（初回デプロイ後に自動取得されます）');
-  return {
-    price: data.price,
-    change: null,
-    extra: data.date ?? undefined,
-  };
+// WTI原油先物 USD/バレル (CL=F) — 日本のガソリン価格の参考指標
+export async function fetchWTI(): Promise<PriceResult> {
+  return fetchYahooFinance('CL=F');
 }
