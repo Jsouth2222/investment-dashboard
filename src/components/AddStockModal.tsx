@@ -48,9 +48,18 @@ export default function AddStockModal({ onClose, onChange }: AddStockModalProps)
     return () => { document.body.style.overflow = ''; };
   }, []);
 
+  // 日本株の4〜5桁コードは自動で .T を付加
+  function normalizeTicker(raw: string): string {
+    const t = raw.trim().toUpperCase();
+    if (/^\d{4,5}$/.test(t)) return `${t}.T`;
+    return t;
+  }
+
   const handleSearch = async () => {
-    const ticker = input.trim().toUpperCase();
-    if (!ticker) return;
+    const raw = input.trim();
+    if (!raw) return;
+    const ticker = normalizeTicker(raw);
+    setInput(ticker); // 入力欄にも正規化後を反映
     setSearching(true);
     setPreview(null);
     setSearchError(null);
@@ -58,7 +67,7 @@ export default function AddStockModal({ onClose, onChange }: AddStockModalProps)
       const result = await searchTicker(ticker);
       setPreview(result);
     } catch {
-      setSearchError('銘柄が見つかりませんでした。ティッカーシンボルを確認してください。');
+      setSearchError('銘柄が見つかりませんでした。ティッカーシンボルを確認してください。\n日本株は証券コード + .T（例: 7203.T）、米国株はティッカー（例: AAPL）を入力してください。');
     } finally {
       setSearching(false);
     }
@@ -105,8 +114,11 @@ export default function AddStockModal({ onClose, onChange }: AddStockModalProps)
         {/* 検索 */}
         <div className="shrink-0 mb-4">
           <p className="text-slate-400 text-xs mb-2">
-            ティッカーシンボルを入力してください<br />
-            <span className="text-slate-500">例: AAPL / TSLA / NVDA（米国株）、7203.T / 6758.T（日本株）</span>
+            銘柄コードを入力してください<br />
+            <span className="text-slate-500">
+              🇯🇵 日本株: 証券コード4桁（例: 7203, 6758）→ 自動で .T を付加<br />
+              🇺🇸 米国株: ティッカー（例: AAPL, TSLA, NVDA）
+            </span>
           </p>
           <div className="flex gap-2">
             <input
