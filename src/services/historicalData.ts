@@ -106,7 +106,10 @@ export async function fetchHistory(id: string, range: Range): Promise<Historical
     case 'gold':    data = await fetchYahooHistory('GC=F',  range); break;
     case 'bitcoin': data = await fetchBitcoinHistory(range);         break;
     case 'wti':     data = await fetchYahooHistory('CL=F',  range); break;
-    default: throw new Error('不明な市場IDです');
+    default:
+      // カスタム銘柄: id をティッカーシンボルとして直接使用
+      data = await fetchYahooHistory(id, range);
+      break;
   }
 
   setCached(key, data);
